@@ -1,7 +1,6 @@
 import {
   clusterApiUrl,
   Commitment,
-  ConfirmedTransaction,
   Connection,
   ConnectionConfig,
   Finality,
@@ -11,6 +10,7 @@ import {
   SignatureResult,
   Signer,
   Transaction,
+  TransactionResponse,
 } from '@solana/web3.js'
 export * from './types'
 
@@ -171,13 +171,13 @@ export class PhantomWalletMock
    */
   getLastConfirmedTransaction(
     commitment?: Finality
-  ): Promise<null | ConfirmedTransaction> {
+  ): Promise<null | TransactionResponse> {
     const lastSig = this._transactionSignatures.pop()
     if (lastSig == null) {
       logDebug('No transaction signature found')
       return Promise.resolve(null)
     }
-    return this.connection.getConfirmedTransaction(lastSig, commitment)
+    return this.connection.getTransaction(lastSig, { commitment })
   }
 
   /**
@@ -238,7 +238,7 @@ export class PhantomWalletMock
       try {
         assert(this._connection != null, 'Need to connect wallet first')
 
-        const { blockhash } = await this._connection.getRecentBlockhash()
+        const { blockhash } = await this._connection.getLatestBlockhash()
         transaction.recentBlockhash = blockhash
 
         transaction.sign(this._signer)
