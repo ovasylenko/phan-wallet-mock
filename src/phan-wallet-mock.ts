@@ -23,12 +23,13 @@ const assert: typeof import('assert') = assert_module.strict ?? assert_module
 import nacl from 'tweetnacl'
 import debug from 'debug'
 import { forceUint8Array } from './utils'
-import {
-  partialSign,
-  TransactionWithInternals,
-  verifySignatures,
-} from './web3js'
+
 import bs58 from 'bs58'
+import {
+  TransactionWithInternals,
+  partialSign,
+  verifySignatures,
+} from './web3js.ts'
 
 const logInfo = debug('phan:info')
 const logDebug = debug('phan:debug')
@@ -240,8 +241,12 @@ export class PhantomWalletMock
 
         const { blockhash } = await this._connection.getLatestBlockhash()
         transaction.recentBlockhash = blockhash
-
+        const oldSignatures = [...transaction.signatures]
         transaction.sign(this._signer)
+        transaction.signatures = [
+          ...transaction.signatures,
+          ...oldSignatures,
+        ].filter((it) => it.signature !== null)
         logDebug('Signed transaction successfully')
         this._transactionSignatures.push(bs58.encode(transaction.signature!))
         resolve(transaction)
