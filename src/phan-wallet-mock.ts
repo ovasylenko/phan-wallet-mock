@@ -29,7 +29,7 @@ import {
   TransactionWithInternals,
   partialSign,
   verifySignatures,
-} from './web3js.ts'
+} from './web3js'
 
 const logInfo = debug('phan:info')
 const logDebug = debug('phan:debug')
